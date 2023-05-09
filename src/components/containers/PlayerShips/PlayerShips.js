@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Draggable from 'react-draggable'
 
 const PlayerShips = () => {
@@ -7,6 +7,7 @@ const PlayerShips = () => {
   const [isBattleshipVertical, setIsBattleshipVertical] = useState(false)
   const [isCruiserVertical, setIsCruiserVertical] = useState(false)
   const [isDestroyerVertical, setIsDestroyerVertical] = useState(false)
+  const shipRef = useRef(null)
 
   const ships = [
     {
@@ -33,20 +34,36 @@ const PlayerShips = () => {
 
   const handleRightClick = (event, ship) => {
     event.preventDefault()
-    if (ship.name === 'carrier') {
-      setIsCarrierVertical(!isCarrierVertical)
-    } else if (ship.name === 'battleship') {
-      setIsBattleshipVertical(!isBattleshipVertical)
-    } else if (ship.name === 'cruiser') {
-      setIsCruiserVertical(!isCruiserVertical)
-    } else if (ship.name === 'destroyer') {
-      setIsDestroyerVertical(!isDestroyerVertical)
+    switch (ship.name) {
+      case 'carrier':
+        setIsCarrierVertical(!isCarrierVertical)
+        break
+      case 'battleship':
+        setIsBattleshipVertical(!isBattleshipVertical)
+        break
+      case 'cruiser':
+        setIsCruiserVertical(!isCruiserVertical)
+        break
+      case 'destroyer':
+        setIsDestroyerVertical(!isDestroyerVertical)
+        break
+      default:
+        break
     }
   }
 
   const handleContextMenu = ship => event => {
     handleRightClick(event, ship)
   }
+
+  useEffect(() => {
+    const ship = shipRef.current
+    // console.log(ship)
+    if (ship) {
+      const { x, y } = ship.getBoundingClientRect()
+      console.log(`Position of section named ${ship}: (${x}, ${y})`)
+    }
+  })
 
   return ships.map(ship => {
     const isVertical = (() => {
@@ -63,7 +80,9 @@ const PlayerShips = () => {
 
     const shipSpans = Array(ship.length)
       .fill()
-      .map((_, i) => <span key={i} className='bg-blue-700 h-10 w-10 ship border border-blue-300'></span>)
+      .map((_, i) => (
+        <span key={i} id={ship.name + i} className='bg-blue-700 h-10 w-10 ship border border-blue-300'></span>
+      ))
 
     return (
       <Draggable
