@@ -1,6 +1,6 @@
 import { useRef } from 'react'
 
-export const generateSquares = (rowKeys, colKeys, playerName, squaresRef, xCor, yCor) => {
+export const generateSquares = (rowKeys, colKeys, playerName, squaresRef) => {
   return rowKeys.flatMap((rowKey, row) => {
     return colKeys.map((colKey, col) => {
       const id = `${rowKey}${colKey}${playerName}`
