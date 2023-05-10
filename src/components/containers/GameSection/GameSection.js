@@ -17,11 +17,11 @@ const GameSection = ({ id }) => {
 
     if (section) {
       const { x, y } = section.getBoundingClientRect()
-      console.log(`Position of section named ${playerName}: (${x}, ${y})`)
+      // console.log(`Position of section named ${playerName}: (${x}, ${y})`)
 
       squareRefs.forEach(squareRef => {
         const { x, y } = squareRef.current.getBoundingClientRect()
-        console.log(`Position of square: (${x}, ${y})`)
+        // console.log(`Position of square of ${playerName}: (${x}, ${y})`)
       })
     }
   }, [sectionRef, playerName])
@@ -29,7 +29,7 @@ const GameSection = ({ id }) => {
   const squares = generateSquares(rowKeys, colKeys, playerName, squaresRef)
 
   return (
-    <section ref={sectionRef} className='w-fit h-fit' id={id}>
+    <section className='w-fit h-fit'>
       <h2 className='text-center text-2xl font-bold'>{playerName}</h2>
       <div className='grid w-full' style={{ gridTemplateColumns: 'auto 1fr' }}>
         <div className='w-fit h-fit'></div>
@@ -55,7 +55,9 @@ const GameSection = ({ id }) => {
             </div>
           ))}
         </div>
-        <div className='grid grid-cols-10 w-[400px] h-fit'>{squares}</div>
+        <div ref={sectionRef} id={id} className='grid grid-cols-10 w-[400px] h-fit'>
+          {squares}
+        </div>
       </div>
     </section>
   )

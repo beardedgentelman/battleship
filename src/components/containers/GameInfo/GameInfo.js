@@ -20,6 +20,7 @@ const GameInfo = ({ gameStage, SetGameStage }) => {
       case 'placement':
         return (
           <>
+            <p className='font-bold mb-2 text-center'>Place your fleet</p>
             <div className='mb-2 w-full h-60 border rounded-md bg-blue-100 border-blue-400 px-2 py-4 flex flex-col gap-2 items-end'>
               <PlayerShips />
             </div>

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import Draggable from 'react-draggable'
 
 const PlayerShips = () => {
@@ -7,7 +7,6 @@ const PlayerShips = () => {
   const [isBattleshipVertical, setIsBattleshipVertical] = useState(false)
   const [isCruiserVertical, setIsCruiserVertical] = useState(false)
   const [isDestroyerVertical, setIsDestroyerVertical] = useState(false)
-  const shipRef = useRef(null)
 
   const ships = [
     {
@@ -56,14 +55,7 @@ const PlayerShips = () => {
     handleRightClick(event, ship)
   }
 
-  useEffect(() => {
-    const ship = shipRef.current
-    // console.log(ship)
-    if (ship) {
-      const { x, y } = ship.getBoundingClientRect()
-      console.log(`Position of section named ${ship}: (${x}, ${y})`)
-    }
-  })
+  let yPosition = 0
 
   return ships.map(ship => {
     const isVertical = (() => {
@@ -84,17 +76,22 @@ const PlayerShips = () => {
         <span key={i} id={ship.name + i} className='bg-blue-700 h-10 w-10 ship border border-blue-300'></span>
       ))
 
+    const defaultPosition = { x: 0, y: yPosition }
+
+    yPosition += 45
+
     return (
       <Draggable
         key={ship.name}
         onStart={() => setIsDragging(true)}
         onDrag={() => setIsDragging(true)}
         onStop={() => setIsDragging(false)}
+        defaultPosition={defaultPosition}
       >
         <div
-          className={`ship-container flex items-end h-fit w-fit ${isDragging ? 'cursor-grabbing' : 'cursor-grab'} ${
-            isVertical ? 'flex-col' : 'flex-row'
-          }`}
+          className={`ship-container absolute flex items-end h-fit w-fit ${
+            isDragging ? 'cursor-grabbing' : 'cursor-grab'
+          } ${isVertical ? 'flex-col' : 'flex-row'}`}
           onContextMenu={handleContextMenu(ship)}
         >
           {shipSpans}
