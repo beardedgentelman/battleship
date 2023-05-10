@@ -1,8 +1,8 @@
 import { useRef } from 'react'
 
 export const generateSquares = (rowKeys, colKeys, playerName, squaresRef) => {
-  return rowKeys.flatMap((rowKey, row) => {
-    return colKeys.map((colKey, col) => {
+  return colKeys.flatMap((colKey, col) => {
+    return rowKeys.map((rowKey, row) => {
       const id = `${rowKey}${colKey}${playerName}`
       const key = `${id}-${row * colKeys.length + col}`
       const squareRef = useRef(null)

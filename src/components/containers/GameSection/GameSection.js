@@ -3,6 +3,8 @@ import { useContext, useEffect, useRef } from 'react'
 import { PlayerContext } from 'App'
 import { generateSquares } from 'helpers/generateSquares'
 
+export const playerSquaresCoord = []
+
 const GameSection = ({ id }) => {
   const { playerName } = useContext(PlayerContext)
   const sectionRef = useRef(null)
@@ -16,12 +18,13 @@ const GameSection = ({ id }) => {
     const squareRefs = squaresRef.current
 
     if (section) {
-      const { x, y } = section.getBoundingClientRect()
-      // console.log(`Position of section named ${playerName}: (${x}, ${y})`)
-
       squareRefs.forEach(squareRef => {
         const { x, y } = squareRef.current.getBoundingClientRect()
-        // console.log(`Position of square of ${playerName}: (${x}, ${y})`)
+        const result = { id: squareRef.current.id, x: x, y: y }
+
+        if (playerName !== 'Computer') {
+          playerSquaresCoord.push(result)
+        }
       })
     }
   }, [sectionRef, playerName])

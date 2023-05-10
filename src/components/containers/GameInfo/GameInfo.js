@@ -1,4 +1,5 @@
 import { gameStages } from 'App'
+import { placementHelper } from 'helpers/placementHelper'
 
 import { Button } from 'components/ui'
 
@@ -13,6 +14,7 @@ const GameInfo = ({ gameStage, SetGameStage }) => {
             onClick={() => {
               SetGameStage(gameStages.placement)
               stageManagement(stage)
+              placementHelper()
             }}
             buttonText='Start Game'
           />
@@ -21,7 +23,7 @@ const GameInfo = ({ gameStage, SetGameStage }) => {
         return (
           <>
             <p className='font-bold mb-2 text-center'>Place your fleet</p>
-            <div className='mb-2 w-full h-60 border rounded-md bg-blue-100 border-blue-400 px-2 py-4 flex flex-col gap-2 items-end'>
+            <div className='mb-2 w-[200px] h-60 border rounded-md bg-blue-100 border-blue-400 px-2 py-4 flex flex-col gap-2 items-end'>
               <PlayerShips />
             </div>
             <Button

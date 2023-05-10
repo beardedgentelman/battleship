@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import Draggable from 'react-draggable'
+// eslint-disable-next-line simple-import-sort/imports
+import { placementHelper } from 'helpers/placementHelper'
 
 const PlayerShips = () => {
   const [isDragging, setIsDragging] = useState(false)
@@ -7,6 +9,11 @@ const PlayerShips = () => {
   const [isBattleshipVertical, setIsBattleshipVertical] = useState(false)
   const [isCruiserVertical, setIsCruiserVertical] = useState(false)
   const [isDestroyerVertical, setIsDestroyerVertical] = useState(false)
+  // const [carrierDefCoords, setCarrierDefCoords] = useState(null)
+  // const [battleshipDefCoords, setBattleshipDefCoords] = useState(null)
+  // const [cruiserDefCoords, setCruiserDefCoords] = useState(null)
+  // const [destroyerDefCoords, setDestroyerDefCoords] = useState(null)
+  const [placementResult, setPlacementResult] = useState(null)
 
   const ships = [
     {
@@ -53,9 +60,25 @@ const PlayerShips = () => {
 
   const handleContextMenu = ship => event => {
     handleRightClick(event, ship)
+    handleCoordOnDrag(event, ship)
   }
 
   let yPosition = 0
+
+  function handleCoordOnDrag(event, ship) {
+    const shipContainer = event.target.parentNode
+    const spans = shipContainer.querySelectorAll('span')
+    const spansArr = []
+    spans.forEach(span => {
+      const coord = span.getBoundingClientRect()
+      const x = coord.x
+      const y = coord.y
+      spansArr.push({ spanId: span.id, x, y })
+    })
+    const result = { name: ship.name, shipSpansCoord: spansArr }
+    setPlacementResult(result)
+    placementHelper(placementResult)
+  }
 
   return ships.map(ship => {
     const isVertical = (() => {
@@ -84,9 +107,13 @@ const PlayerShips = () => {
       <Draggable
         key={ship.name}
         onStart={() => setIsDragging(true)}
-        onDrag={() => setIsDragging(true)}
+        onDrag={e => {
+          setIsDragging(true)
+          handleCoordOnDrag(e, ship)
+        }}
         onStop={() => setIsDragging(false)}
         defaultPosition={defaultPosition}
+        cancel='placed'
       >
         <div
           className={`ship-container absolute flex items-end h-fit w-fit ${

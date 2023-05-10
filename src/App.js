@@ -17,13 +17,13 @@ function App() {
   }
 
   return (
-    <div className='App w-full px-3 font-jakartaSans text-gray-700' style={appStyle}>
+    <div className='App w-full h-screen px-3 font-jakartaSans text-gray-700' style={appStyle}>
       <Header headerTitle='Sea Battle' />
       <main className='flex items-center justify-between px-10 max-w-7xl mx-auto'>
-        <GameInfo gameStage={gameStage} SetGameStage={SetGameStage} />
-        <PlayerContext.Provider value={{ playerName: 'You' }}>
-          <GameSection playerName='You' id='you' />
+        <PlayerContext.Provider value={{ playerName: 'Player' }}>
+          <GameSection playerName='Player' id='player' />
         </PlayerContext.Provider>
+        <GameInfo gameStage={gameStage} SetGameStage={SetGameStage} />
         <PlayerContext.Provider value={{ playerName: 'Computer' }}>
           <GameSection playerName='Computer' id='computer' />
         </PlayerContext.Provider>
