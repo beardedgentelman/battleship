@@ -4,6 +4,7 @@ import { PlayerContext } from 'App'
 import { generateSquares } from 'helpers/generateSquares'
 
 export const playerSquaresCoord = []
+export const computerSquaresCoord = []
 
 const GameSection = ({ id }) => {
   const { playerName } = useContext(PlayerContext)
@@ -24,6 +25,9 @@ const GameSection = ({ id }) => {
 
         if (playerName !== 'Computer') {
           playerSquaresCoord.push(result)
+        }
+        if (playerName === 'Computer') {
+          computerSquaresCoord.push(result)
         }
       })
     }

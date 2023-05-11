@@ -8,10 +8,11 @@ export function placementHelper(handleCoordResult) {
       playerSquaresCoord.forEach(square => {
         const xDiff = Math.abs(Math.round(span.x) - Math.round(square.x))
         const yDiff = Math.abs(Math.round(span.y) - Math.round(square.y))
-        if (xDiff <= 15 && yDiff <= 15) {
-          console.log(square.id)
-          console.log('span: ', Math.round(span.x), Math.round(span.y))
-          console.log('square: ', square, Math.round(square.x), Math.round(square.y))
+        if (xDiff <= 20 && yDiff <= 20) {
+          if (!handleCoordResult.placementResult) {
+            handleCoordResult.placementResult = []
+          }
+          handleCoordResult.placementResult.push(square)
         }
       })
     })

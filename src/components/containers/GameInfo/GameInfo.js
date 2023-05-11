@@ -1,4 +1,5 @@
 import { gameStages } from 'App'
+import { generateComputerRandomCoord } from 'helpers/generateRandomCoordinates'
 import { placementHelper } from 'helpers/placementHelper'
 
 import { Button } from 'components/ui'
@@ -15,6 +16,7 @@ const GameInfo = ({ gameStage, SetGameStage }) => {
               SetGameStage(gameStages.placement)
               stageManagement(stage)
               placementHelper()
+              generateComputerRandomCoord()
             }}
             buttonText='Start Game'
           />

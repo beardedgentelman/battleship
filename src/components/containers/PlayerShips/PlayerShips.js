@@ -9,32 +9,34 @@ const PlayerShips = () => {
   const [isBattleshipVertical, setIsBattleshipVertical] = useState(false)
   const [isCruiserVertical, setIsCruiserVertical] = useState(false)
   const [isDestroyerVertical, setIsDestroyerVertical] = useState(false)
-  // const [carrierDefCoords, setCarrierDefCoords] = useState(null)
-  // const [battleshipDefCoords, setBattleshipDefCoords] = useState(null)
-  // const [cruiserDefCoords, setCruiserDefCoords] = useState(null)
-  // const [destroyerDefCoords, setDestroyerDefCoords] = useState(null)
   const [placementResult, setPlacementResult] = useState(null)
+  const [defaultPositions, setDefaultPositions] = useState({
+    carrier: { x: 0, y: 0 },
+    battleship: { x: 0, y: 45 },
+    cruiser: { x: 0, y: 90 },
+    destroyer: { x: 0, y: 135 }
+  })
 
   const ships = [
     {
       name: 'carrier',
       length: 4,
-      placed: null
+      placed: false
     },
     {
       name: 'battleship',
       length: 3,
-      placed: null
+      placed: false
     },
     {
       name: 'cruiser',
       length: 2,
-      placed: null
+      placed: false
     },
     {
       name: 'destroyer',
       length: 1,
-      placed: null
+      placed: false
     }
   ]
 
@@ -63,21 +65,52 @@ const PlayerShips = () => {
     handleCoordOnDrag(event, ship)
   }
 
-  let yPosition = 0
+  function onStartDrag(ship) {
+    ship.placed = false
+    const shipCont = document.getElementById(ship.name + '0').parentElement
+    shipCont.style.left = ''
+    shipCont.style.top = ''
+  }
 
   function handleCoordOnDrag(event, ship) {
+    ship.placed = false
     const shipContainer = event.target.parentNode
     const spans = shipContainer.querySelectorAll('span')
     const spansArr = []
+
     spans.forEach(span => {
       const coord = span.getBoundingClientRect()
       const x = coord.x
       const y = coord.y
       spansArr.push({ spanId: span.id, x, y })
     })
-    const result = { name: ship.name, shipSpansCoord: spansArr }
+    const result = { ship: ship, shipSpansCoord: spansArr }
     setPlacementResult(result)
-    placementHelper(placementResult)
+    placementHelper(result)
+  }
+
+  function handleStopDrag(ship) {
+    ship.placed = true
+    if (placementResult && placementResult.shipSpansCoord) {
+      placementResult.shipSpansCoord.forEach(span => {
+        const shipCont = document.getElementById(span.spanId).parentElement
+
+        if (placementResult.placementResult) {
+          // const computedStyle = getComputedStyle(shipCont)
+          // const transformValue = computedStyle.transform
+          // const translateValues = transformValue.match(/translate\((.+?)\)/)
+
+          shipCont.style.transform = 'translate(0, 0)'
+          shipCont.style.left = placementResult.placementResult[0].x + 'px'
+          shipCont.style.top = placementResult.placementResult[0].y + 'px'
+
+          setDefaultPositions(prevDefaultPositions => ({
+            ...prevDefaultPositions,
+            [ship.name]: { x: 0, y: 0 }
+          }))
+        }
+      })
+    }
   }
 
   return ships.map(ship => {
@@ -99,19 +132,23 @@ const PlayerShips = () => {
         <span key={i} id={ship.name + i} className='bg-blue-700 h-10 w-10 ship border border-blue-300'></span>
       ))
 
-    const defaultPosition = { x: 0, y: yPosition }
-
-    yPosition += 45
+    const defaultPosition = defaultPositions[ship.name]
 
     return (
       <Draggable
         key={ship.name}
-        onStart={() => setIsDragging(true)}
+        onStart={() => {
+          setIsDragging(true)
+          onStartDrag(ship)
+        }}
         onDrag={e => {
           setIsDragging(true)
           handleCoordOnDrag(e, ship)
         }}
-        onStop={() => setIsDragging(false)}
+        onStop={() => {
+          setIsDragging(false)
+          handleStopDrag(ship)
+        }}
         defaultPosition={defaultPosition}
         cancel='placed'
       >
