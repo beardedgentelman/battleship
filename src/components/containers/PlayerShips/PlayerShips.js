@@ -1,7 +1,10 @@
 import { useState } from 'react'
 import Draggable from 'react-draggable'
+
+import { playerSquaresCoord } from '../GameSection/GameSection'
 // eslint-disable-next-line simple-import-sort/imports
-import { placementHelper } from 'helpers/placementHelper'
+
+export const playerPositions = []
 
 const PlayerShips = () => {
   const [isDragging, setIsDragging] = useState(false)
@@ -15,6 +18,12 @@ const PlayerShips = () => {
     battleship: { x: 0, y: 45 },
     cruiser: { x: 0, y: 90 },
     destroyer: { x: 0, y: 135 }
+  })
+  const [currentPositions, setCurrentPositions] = useState({
+    carrier: { x: 0, y: 0 },
+    battleship: { x: 0, y: 0 },
+    cruiser: { x: 0, y: 0 },
+    destroyer: { x: 0, y: 0 }
   })
 
   const ships = [
@@ -68,6 +77,7 @@ const PlayerShips = () => {
   function onStartDrag(ship) {
     ship.placed = false
     const shipCont = document.getElementById(ship.name + '0').parentElement
+    shipCont.style.transform = `translate(${currentPositions[ship.name].x}, ${currentPositions[ship.name].y})`
     shipCont.style.left = ''
     shipCont.style.top = ''
   }
@@ -86,29 +96,65 @@ const PlayerShips = () => {
     })
     const result = { ship: ship, shipSpansCoord: spansArr }
     setPlacementResult(result)
-    placementHelper(result)
+    confirmPlayerCoordinates(result)
   }
 
   function handleStopDrag(ship) {
     ship.placed = true
-    if (placementResult && placementResult.shipSpansCoord) {
-      placementResult.shipSpansCoord.forEach(span => {
-        const shipCont = document.getElementById(span.spanId).parentElement
+    // TODO: deal with the flashing of ships and positioning after installation on the game board
+    if (placementResult && placementResult.shipSpansCoord.length > 0) {
+      console.log(placementResult)
+      const span = placementResult.shipSpansCoord[0]
+      const shipCont = document.getElementById(span.spanId).parentElement
+      const computedStyle = getComputedStyle(shipCont)
+      const transformValue = computedStyle.transform
+      const regex = /matrix\((.+), (.+), (.+), (.+), (.+), (.+)\)/
+      const matches = transformValue.match(regex)
+      // eslint-disable-next-line no-unused-vars
+      const [, a, b, c, d, tx, ty] = matches
+      const newX = tx
+      const newY = ty
 
-        if (placementResult.placementResult) {
-          // const computedStyle = getComputedStyle(shipCont)
-          // const transformValue = computedStyle.transform
-          // const translateValues = transformValue.match(/translate\((.+?)\)/)
+      if (placementResult.placementResult) {
+        setCurrentPositions(prevCurrentPositions => ({
+          ...prevCurrentPositions,
+          [ship.name]: { x: newX, y: newY }
+        }))
+      }
 
-          shipCont.style.transform = 'translate(0, 0)'
-          shipCont.style.left = placementResult.placementResult[0].x + 'px'
-          shipCont.style.top = placementResult.placementResult[0].y + 'px'
+      shipCont.style.transform = 'translate(0, 0)'
+      shipCont.style.left = placementResult.placementResult[0].x + 'px'
+      shipCont.style.top = placementResult.placementResult[0].y + 'px'
+    }
+    const containsSpanId = placementResult.shipSpansCoord.some(spanCoord =>
+      playerPositions.some(positions => positions[0].spanId === spanCoord.spanId)
+    )
 
-          setDefaultPositions(prevDefaultPositions => ({
-            ...prevDefaultPositions,
-            [ship.name]: { x: 0, y: 0 }
-          }))
-        }
+    if (!containsSpanId) {
+      playerPositions.push(placementResult.shipSpansCoord)
+    } else {
+      const index = playerPositions.findIndex(positions =>
+        positions.some(pos => pos.spanId === placementResult.shipSpansCoord[0].spanId)
+      )
+      playerPositions[index] = placementResult.shipSpansCoord
+    }
+  }
+
+  function confirmPlayerCoordinates(handleCoordResult) {
+    if (handleCoordResult) {
+      const shipSpansCoords = handleCoordResult.shipSpansCoord
+
+      shipSpansCoords.forEach(span => {
+        playerSquaresCoord.forEach(square => {
+          const xDiff = Math.abs(Math.round(span.x) - Math.round(square.x))
+          const yDiff = Math.abs(Math.round(span.y) - Math.round(square.y))
+          if (xDiff <= 20 && yDiff <= 20) {
+            if (!handleCoordResult.placementResult) {
+              handleCoordResult.placementResult = []
+            }
+            handleCoordResult.placementResult.push(square)
+          }
+        })
       })
     }
   }
@@ -132,8 +178,6 @@ const PlayerShips = () => {
         <span key={i} id={ship.name + i} className='bg-blue-700 h-10 w-10 ship border border-blue-300'></span>
       ))
 
-    const defaultPosition = defaultPositions[ship.name]
-
     return (
       <Draggable
         key={ship.name}
@@ -149,7 +193,7 @@ const PlayerShips = () => {
           setIsDragging(false)
           handleStopDrag(ship)
         }}
-        defaultPosition={defaultPosition}
+        defaultPosition={defaultPositions[ship.name]}
         cancel='placed'
       >
         <div

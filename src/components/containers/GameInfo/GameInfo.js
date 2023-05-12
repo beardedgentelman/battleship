@@ -1,10 +1,11 @@
 import { gameStages } from 'App'
 import { generateComputerRandomCoord } from 'helpers/generateRandomCoordinates'
-import { placementHelper } from 'helpers/placementHelper'
 
 import { Button } from 'components/ui'
 
-import PlayerShips from '../PlayerShips/PlayerShips'
+import PlayerShips, { playerPositions } from '../PlayerShips/PlayerShips'
+
+export const positions = []
 
 const GameInfo = ({ gameStage, SetGameStage }) => {
   function stageManagement(stage) {
@@ -15,10 +16,9 @@ const GameInfo = ({ gameStage, SetGameStage }) => {
             onClick={() => {
               SetGameStage(gameStages.placement)
               stageManagement(stage)
-              placementHelper()
-              generateComputerRandomCoord()
+              positions.push(generateComputerRandomCoord())
             }}
-            buttonText='Start Game'
+            buttonText='Start Placing'
           />
         )
       case 'placement':
@@ -32,9 +32,16 @@ const GameInfo = ({ gameStage, SetGameStage }) => {
               onClick={() => {
                 SetGameStage(gameStages.game)
                 stageManagement(stage)
+                positions.push(playerPositions)
               }}
               buttonText='Ready!'
             />
+          </>
+        )
+      case 'game':
+        return (
+          <>
+            <PlayerShips />
           </>
         )
       default:
